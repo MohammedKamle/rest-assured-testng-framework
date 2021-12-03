@@ -59,14 +59,14 @@ public class PlaylistTests {
         Playlist playlist = new Playlist();
         playlist.setName(name);
         playlist.setDescription(description);
-        playlist.setPublic(_public);
+        playlist.set_public(_public);
         return playlist;
     }
 
     public void assertPlaylistEqual(Playlist responsePLaylist, Playlist requestPlaylist){
         assertThat(responsePLaylist.getName(), equalTo(requestPlaylist.getName()));
         assertThat(responsePLaylist.getDescription(), equalTo(requestPlaylist.getDescription()));
-        assertThat(responsePLaylist.getPublic(), equalTo(requestPlaylist.getPublic()));
+        assertThat(responsePLaylist.get_public(), equalTo(requestPlaylist.get_public()));
     }
 
     public void assertStatusCode(int actualStatusCode, int expectedStatusCode){
