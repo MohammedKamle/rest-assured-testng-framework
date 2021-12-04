@@ -1,9 +1,11 @@
 package com.spotify.oauth2.test;
 
 import com.spotify.oauth2.api.applicationApi.PlaylistApi;
+import com.spotify.oauth2.enums.StatusCodes;
 import com.spotify.oauth2.pojo.Error;
 import com.spotify.oauth2.pojo.Playlist;
 import com.spotify.oauth2.utils.DataLoader;
+import com.spotify.oauth2.utils.FakerUtils;
 import io.restassured.response.Response;
 
 import org.testng.annotations.Test;
@@ -16,9 +18,9 @@ public class PlaylistTests {
 
     @Test
     public void shouldBeAbleToCreatePlaylist(){
-        Playlist requestPlaylist = playlistBuilder("Namaste London", "New playlist description", false);
+        Playlist requestPlaylist = playlistBuilder(FakerUtils.generateName(), FakerUtils.generateDescription(),false);
         Response response = PlaylistApi.post(requestPlaylist);
-        assertStatusCode(response.statusCode(), 201);
+        assertStatusCode(response.statusCode(), StatusCodes.CODE_201.getCode());
         assertPlaylistEqual(response.as(Playlist.class), requestPlaylist);
     }
 
@@ -26,33 +28,33 @@ public class PlaylistTests {
     public void shouldBeAbleToGetPlaylist(){
         Playlist requestPlaylist = playlistBuilder("Evening Vibes", "New playlist description", false);
         Response response = PlaylistApi.get(DataLoader.getInstance().getGetPlaylistId());
-        assertStatusCode(response.getStatusCode(), 200);
+        assertStatusCode(response.getStatusCode(), StatusCodes.CODE_200.getCode());
         assertPlaylistEqual(response.as(Playlist.class), requestPlaylist);
     }
 
     @Test
     public void shouldBeAbleToUpdateInPlaylist(){
-        Playlist updatedPlaylist = playlistBuilder("Evening Vibes", "New playlist description", false);
+        Playlist updatedPlaylist = playlistBuilder(FakerUtils.generateName(), FakerUtils.generateDescription(), false);
         Response response = PlaylistApi.update(DataLoader.getInstance().getUpdatePlaylistId(), updatedPlaylist);;
-        assertThat(response.getStatusCode(), equalTo(200));
+        assertThat(response.getStatusCode(), equalTo(StatusCodes.CODE_200.getCode()));
 
     }
 
     @Test
     public void shouldNotBeAbleToCreatePlaylistWithoutName(){
-        Playlist playlist = playlistBuilder("", "New playlist description", false);
+        Playlist playlist = playlistBuilder("", FakerUtils.generateDescription(), false);
         Response response = PlaylistApi.post(playlist);
-        assertStatusCode(response.getStatusCode(), 400);
-        assertError(response.as(Error.class),400,"Missing required field: name");
+        assertStatusCode(response.getStatusCode(), StatusCodes.CODE_400.getCode());
+        assertError(response.as(Error.class),StatusCodes.CODE_400.getCode(), StatusCodes.CODE_400.getMsg());
     }
 
     @Test
     public void shouldNotBeAbleToCreatePlaylistWithInvalidToken(){
         String invalidToken =  "Bearer some76764random88/.invalid_token";
-        Playlist playlist = playlistBuilder("New Playlist101", "New playlist description", false);
+        Playlist playlist = playlistBuilder(FakerUtils.generateName(), FakerUtils.generateDescription(), false);
         Response response = PlaylistApi.post(invalidToken,playlist);
-        assertStatusCode(response.getStatusCode(), 401);
-        assertError(response.as(Error.class), 401,"Invalid access token");
+        assertStatusCode(response.getStatusCode(), StatusCodes.CODE_401.getCode());
+        assertError(response.as(Error.class), StatusCodes.CODE_401.getCode(), StatusCodes.CODE_401.getMsg());
     }
 
     public Playlist playlistBuilder(String name, String description, boolean _public){
